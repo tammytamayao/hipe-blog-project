@@ -1,0 +1,1 @@
+Rails.application.config.session_store :cookie_store, key: 'blog_app_session', domain: ENV['URL_REACT']
