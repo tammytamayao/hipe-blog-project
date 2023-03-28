@@ -49,7 +49,7 @@ const Posts = () => {
     }
   }  
 
-  const getAllPosts = async () => {
+  const getSearchPosts = async () => {
     await isTokenExpired();
     const headers = {'Authorization': 'Bearer '+ user_token}
       const response: any = await client.get(baseURL+`/search/posts/`+params.keyword,{headers: headers});
@@ -62,7 +62,7 @@ const Posts = () => {
     if(window.location.toString().includes("/posts") === false ) {
       window.location.replace(("/posts"));
     }
-    getAllPosts();
+    getSearchPosts();
   },[]);
 
   const allPosts = posts.map((post, index) => (
