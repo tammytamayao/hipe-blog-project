@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {baseURL, client} from "../config/AxiosConfig";
+import {baseURL, client} from "../../config/AxiosConfig";
 import NewComment from "./NewComment";
 import Cookies from 'universal-cookie';
 

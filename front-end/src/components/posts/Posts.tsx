@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {baseURL, client} from "../config/AxiosConfig";
+import {baseURL, client} from "../../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
 import Cookies from 'universal-cookie';
 
@@ -58,9 +58,6 @@ const Posts = () => {
   }
 
   useEffect(() => {
-    if(window.location.toString().includes("/posts") === false ) {
-      window.location.replace(("/posts"));
-    }
     getAllPosts();
   },[]);
 

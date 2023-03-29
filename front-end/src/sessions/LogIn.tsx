@@ -23,7 +23,7 @@ const LogIn = () => {
         useEffect(() => {
             let user_token = cookies.get('user_token')
             if (user_token != null) {
-                navigate("/userhome");
+                navigate("/myprofile");
             }
           }, []);
           
@@ -50,7 +50,7 @@ const LogIn = () => {
               }
               cookies.set('user_token', res["token"], { path: '/' });
 
-              navigate("/userhome");
+              navigate("/myprofile");
 
           };
     
