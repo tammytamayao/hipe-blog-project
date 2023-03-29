@@ -108,8 +108,8 @@ class Api::V1::UsersController < ApplicationController
         middle_name = ca.middle_name
         last_name = ca.last_name
 
-        expiry = (2).minutes.from_now.to_i
-        payload = { :user_id => user_id,  email: email, :user_created => user_created, :first_name => first_name, :middle_name => middle_name, :last_name => last_name, :expiry => expiry }
+        exp = (20).minutes.from_now.to_i
+        payload = { :user_id => user_id,  email: email, :user_created => user_created, :first_name => first_name, :middle_name => middle_name, :last_name => last_name, :exp => exp }
 
         hmac_secret = ENV['JWT_SECRET']
         token = JWT.encode payload, hmac_secret, 'HS256'
@@ -135,17 +135,11 @@ class Api::V1::UsersController < ApplicationController
     def token_expired
         token = request.headers["Authorization"]
         token.gsub!('Bearer ','')
-        
-        if !token
-          head :forbidden
-        end
-        if !valid_token(token)
-          head :forbidden
-        end
 
         jwt_secret = ENV['JWT_SECRET']
-        user_token = JWT.decode(token, jwt_secret, algorithm: 'HS256')
-        token_expiration = user_token[0]['expiry']
+        user_token = JWT.decode token, jwt_secret, true, { verify_expiration: false, algorithm: 'HS256' }
+
+        token_expiration = user_token[0]['exp']
         email = user_token[0]['email']
         currentTime = Time.now.to_f
         if currentTime > token_expiration
@@ -153,7 +147,7 @@ class Api::V1::UsersController < ApplicationController
         else
             render :json => {:response => "active" }
         end
-
+        
     end
     
     private
