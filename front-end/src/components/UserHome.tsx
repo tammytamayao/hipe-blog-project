@@ -1,25 +1,16 @@
 import React, { useEffect} from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {baseURL, client} from "../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
 import Cookies from 'universal-cookie';
-import {MainHeader} from "../headers/MainHeader";
 
 const UserHome = () => {
-
-
-  const navigate = useNavigate();
 
   const cookies = new Cookies();
   let user_token = cookies.get('user_token')
 
   const myDecodedToken = decodeToken(user_token+"");
   const decodeUserToken = JSON.parse( JSON.stringify(myDecodedToken) );
-
-  const logOut = () => {
-    navigate("/logout");
-  };
-
 
   const payloadToken = {token: user_token};
 
@@ -37,7 +28,6 @@ const UserHome = () => {
 
   return (
     <>
-    <MainHeader/>
         <div className="p-5 md:p-16 lg:p-28">
             <div className="flex flex-col justify-center">
                 <div className="flex flex-col mt-5">

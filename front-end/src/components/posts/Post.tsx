@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {baseURL, client, filesURL} from "../config/AxiosConfig";
-import Comments from "../comments/Comments";
+import {baseURL, client, filesURL} from "../../config/AxiosConfig";
 import Cookies from 'universal-cookie';
 
 interface postState {
@@ -67,9 +66,6 @@ const Post = () => {
           <span className="pl-4"><button type="button" className="btn-primary bg-gray-500 hover:bg-red-600" onClick={deletePost}>Delete</button></span>
         </div>
       </section>
-
-      <section className="showPost-container"><Comments /></section>
-    
     </div>
   );
 }
