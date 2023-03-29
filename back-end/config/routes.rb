@@ -27,6 +27,11 @@ Rails.application.routes.draw do
       post '/users/requirejwt/', to: 'users#requirejwt'
       get '/users/token_expired/', to: 'users#token_expired'
 
+      get '/shared_posts', to: 'shared_posts#index'
+      post '/shared_posts/create', to: 'shared_posts#create'
+      delete '/shared_posts/:id', to: 'shared_posts#destroy'
+      put '/shared_posts/:id/edit', to: 'shared_posts#update'
+
     end
   end
 
