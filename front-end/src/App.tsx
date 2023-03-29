@@ -11,6 +11,8 @@ import Comments from './comments/Comments';
 import EditComment from './comments/EditComment';
 import UserHome from './components/UserHome';
 import LogOut from './sessions/LogOut';
+import SearchPosts from './search/posts';
+import SearchUsers from './search/users';
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
       <Route path="/posts/:post_id/comments/:id/edit" element={<EditComment />} />
       <Route path="/userhome" element={<UserHome/>} />
       <Route path="/logout" element={<LogOut/>} />
+      <Route path="/search/posts/:keyword" element={<SearchPosts />} />
+      <Route path="/search/users/:keyword" element={<SearchUsers />} />
     </Routes>
   </Router>
   )

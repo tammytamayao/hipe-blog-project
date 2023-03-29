@@ -26,6 +26,9 @@ Rails.application.routes.draw do
       post '/users/getuserjwt/', to: 'users#getuserjwt'
       post '/users/requirejwt/', to: 'users#requirejwt'
       get '/users/token_expired/', to: 'users#token_expired'
+      
+      get '/search/posts/:keyword', to: 'search#posts'
+      get '/search/users/:keyword', to: 'search#users'
 
     end
   end
