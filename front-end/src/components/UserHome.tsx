@@ -1,43 +1,15 @@
-import React, { useEffect} from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {baseURL, client} from "../config/AxiosConfig";
+import React from "react";
+import { Link } from "react-router-dom";
 import { decodeToken } from "react-jwt";
-import Cookies from 'universal-cookie';
-import {MainHeader} from "../headers/MainHeader";
+import { useTokenContext } from "../context/tokenContext";
 
 const UserHome = () => {
-
-
-  const navigate = useNavigate();
-
-  const cookies = new Cookies();
-  let user_token = cookies.get('user_token')
-
+  const { user_token } = useTokenContext()
   const myDecodedToken = decodeToken(user_token+"");
   const decodeUserToken = JSON.parse( JSON.stringify(myDecodedToken) );
 
-  const logOut = () => {
-    navigate("/logout");
-  };
-
-
-  const payloadToken = {token: user_token};
-
-  const validateToken = async () => {
-    const headers = {'Authorization': 'Bearer '+user_token}
-    const response: any = await client.post(baseURL+`/users/requirejwt`, payloadToken,{headers:headers});
-    if(response.status===204) {
-      alert("Successfully Logged In");
-    } 
-  }
-
-  useEffect(() => {
-    validateToken();
-  },[]);
-
   return (
     <>
-    <MainHeader/>
         <div className="p-5 md:p-16 lg:p-28">
             <div className="flex flex-col justify-center">
                 <div className="flex flex-col mt-5">

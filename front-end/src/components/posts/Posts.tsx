@@ -1,32 +1,21 @@
 import React, { useState, useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {baseURL, client} from "../config/AxiosConfig";
+import {baseURL, client} from "../../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
-import Cookies from 'universal-cookie';
+import { useTokenContext } from "../../context/tokenContext";
 
 const Posts = () => {
 
   const navigate = useNavigate();
   const [posts, setPosts] = useState<any[]>([]);
-
-  const cookies = new Cookies();
-  let user_token = cookies.get('user_token')
-
-  const isTokenExpired= async () => {
-    const headers = {'Authorization': 'Bearer '+user_token}
-    const response: any = await client.get(baseURL+`/users/token_expired`,{headers: headers});
-    if(response.status==200 && response.data.response=="expired"){
-      cookies.set('user_token', response.data.new_token, { path: '/' });
-    }
-  }
+  const { user_token } = useTokenContext()
+  const decodeUserToken = JSON.parse( JSON.stringify(decodeToken(user_token+"")));
+  const headers = {'Authorization': 'Bearer '+ user_token}
 
   const likePost = async (post:any) => {
-    await isTokenExpired();
-    const decodeUserToken = JSON.parse( JSON.stringify(decodeToken(user_token+"")));
     const payload = {post_id:post.id, user_id: decodeUserToken.user_id, token: user_token};
-    const headers = {'Authorization': 'Bearer '+ user_token}
     const response: any = await client.post(baseURL+`/posts/${post.id}/likers/create`,payload,{headers: headers});
-    if(response.status==200 && response.data.result!=='liked') {
+    if(response.status===200 && response.data.result!=='liked') {
       navigate("/posts")
       alert('Post liked');
       window.location.reload();
@@ -37,20 +26,15 @@ const Posts = () => {
   }
 
   const unlikePost = async (like:any) => {
-    await isTokenExpired();
-    const decodeUserToken = JSON.parse( JSON.stringify(decodeToken(user_token+"")));
     const payload = {post_id:like.post_id,user_id: decodeUserToken.user_id, token: user_token};
-    const headers = {'Authorization': 'Bearer '+ user_token}
     const response: any = await client.put(baseURL+`/posts/${like.post_id}/likers/${like.id}/destroy`,payload,{headers: headers});
-    if(response.status==200) {
+    if(response.status===200) {
       alert("post unliked");
       window.location.reload();
     }
   }  
 
   const getAllPosts = async () => {
-    await isTokenExpired();
-    const headers = {'Authorization': 'Bearer '+ user_token}
       const response: any = await client.get(baseURL+`/posts`,{headers: headers});
       if(response.status===200) {
         setPosts(response.data);
@@ -58,9 +42,6 @@ const Posts = () => {
   }
 
   useEffect(() => {
-    if(window.location.toString().includes("/posts") === false ) {
-      window.location.replace(("/posts"));
-    }
     getAllPosts();
   },[]);
 

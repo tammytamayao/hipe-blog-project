@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {baseURL, client, filesURL} from "../config/AxiosConfig";
+import {baseURL, client, filesURL} from "../../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
-import Cookies from 'universal-cookie';
+import { useTokenContext } from "../../context/tokenContext";
 
 interface postState {
     id: number,
@@ -19,9 +19,9 @@ const EditPost = () => {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
 
-    const cookies = new Cookies();
-    let user_token = cookies.get('user_token')
-    const decodeUserToken = JSON.parse(JSON.stringify(decodeToken(user_token+"")));
+    const { user_token } = useTokenContext()
+    const myDecodedToken = decodeToken(user_token+"");
+    const decodeUserToken = JSON.parse( JSON.stringify(myDecodedToken));
     const [photo123, setphoto123] = useState<any | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -35,16 +35,7 @@ const EditPost = () => {
       setphoto123(URL.createObjectURL(event.target.files[0]));
     }
 
-    const isTokenExpired= async () => {
-      const headers = {'Authorization': 'Bearer '+user_token}
-      const response: any = await client.get(baseURL+`/users/token_expired`,{headers: headers});
-      if(response.status==200 && response.data.response=="expired"){
-        cookies.set('user_token', response.data.new_token, { path: '/' });
-      }
-    }
-
     const getPost = async () => {
-      await isTokenExpired();
       const headers = { 'Authorization': 'Bearer '+user_token }
       const response: any = await client.get(baseURL+`/posts/${params.id}`,{headers: headers});
       if(response.status===200) {
@@ -74,7 +65,6 @@ const EditPost = () => {
     const onSubmit = async (post: React.FormEvent<HTMLFormElement>) => {
         post.preventDefault();
         const file = post.currentTarget["fileInput"].files[0];
-        await isTokenExpired();
 
         if (title.length > 0){titleDef = title}
         if (body.length > 0){bodyDef = body}
@@ -124,11 +114,8 @@ const EditPost = () => {
                     onChange={(e) => onChange(e, setBody)}
                   ></textarea>
                   {post.image_url && photo123 == null &&  <img className="img-view my-4" alt="sample" src={ filesURL +  post.image_url }/> }
-
-
                   {photo123 &&  <img  className="img-view my-4" src={photo123} /> }
                   <input id="fileInput"  type="file" accept="image/*" onChange={handleInputChange} />
-
                 </div>
     
                 <span className="flex justify-center"><button className="btn-secondary">Update Post</button></span>
@@ -136,7 +123,6 @@ const EditPost = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" /></svg>
                   <Link to="/posts"> Back to Main</Link>
                 </span>
-    
         </form>
       </div>
     )

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {baseURL, client} from "../config/AxiosConfig";
+import {baseURL, client} from "../../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
-import Cookies from 'universal-cookie';
+import { useTokenContext } from "../../context/tokenContext";
 
 interface postState {
   id: number,
@@ -22,8 +22,7 @@ const NewPost = () => {
     body:""
   });
 
-  const cookies = new Cookies();
-  let user_token = cookies.get('user_token')
+  const { user_token } = useTokenContext()
   const [photo123, setphoto123] = useState<any | null>(null);
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = event.target.files;
@@ -37,14 +36,6 @@ const NewPost = () => {
 
   const [errorMessage, setErrorMessage] = useState('');
 
-  const isTokenExpired= async () => {
-    const headers = {'Authorization': 'Bearer '+user_token}
-    const response: any = await client.get(baseURL+`/users/token_expired`,{headers: headers});
-    if(response.status==200 && response.data.response=="expired"){
-      cookies.set('user_token', response.data.new_token, { path: '/' });
-    }
-  }
-
   const onChange = (post: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement> , setFunction: { (value: React.SetStateAction<string>): void; (value: React.SetStateAction<string>): void;}) => {
     setFunction(post.target.value);
   };
@@ -52,8 +43,8 @@ const NewPost = () => {
   const onSubmit = async (post: React.FormEvent<HTMLFormElement>) => {
     post.preventDefault();
     const file = post.currentTarget["fileInput"].files[0];
-    await isTokenExpired();
-    const decodeUserToken = JSON.parse( JSON.stringify(decodeToken(user_token+"")));
+    const myDecodedToken = decodeToken(user_token+"");
+    const decodeUserToken = JSON.parse( JSON.stringify(myDecodedToken) );
 
     const payload = {title: title, body: body, user_id: decodeUserToken.user_id, token: user_token, image: file};
     const headers = {'Authorization': 'Bearer '+user_token, "Content-Type": `multipart/form-data: boundary=add-random-characters`}
