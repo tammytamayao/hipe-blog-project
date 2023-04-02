@@ -2,26 +2,15 @@ import React, { useState, useEffect} from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {baseURL, client} from "../../config/AxiosConfig";
 import NewComment from "./NewComment";
-import Cookies from 'universal-cookie';
+import { useTokenContext } from "../../context/tokenContext";
 
 const Comments = () => {
     const navigate = useNavigate();
     const params = useParams();
     const [comments, setComments] = useState<any[]>([]);
-
-    const cookies = new Cookies();
-    let user_token = cookies.get('user_token')
-
-    const isTokenExpired= async () => {
-      const headers = {'Authorization': 'Bearer '+user_token}
-      const response: any = await client.get(baseURL+`/users/token_expired`,{headers: headers});
-      if(response.status==200 && response.data.response=="expired"){
-        cookies.set('user_token', response.data.new_token, { path: '/' });
-      }
-    }
+    const { user_token } = useTokenContext()
      
     const getAllComments = async () => {
-      await isTokenExpired();
       const headers = {'Authorization': 'Bearer '+ user_token}
       const response: any = await client.get(baseURL+`/posts/${params.id}/comments`,{headers: headers});
       if(response.status===200) {
@@ -42,7 +31,7 @@ const Comments = () => {
           } else {
             alert('Post not deleted. Try Again.')
           }
-      };
+    };
       
     const allComments = comments.map((comment, index) => (
 
@@ -59,7 +48,6 @@ const Comments = () => {
           </span>
           </span>
         </span>
-
       </div>
     ));
     
@@ -78,3 +66,4 @@ const Comments = () => {
 }
 
 export default Comments;
+

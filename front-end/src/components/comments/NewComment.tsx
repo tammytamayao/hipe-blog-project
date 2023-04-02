@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {baseURL, client} from "../../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
-import Cookies from 'universal-cookie';
+import { useTokenContext } from "../../context/tokenContext";
 
 interface commentState {
     id: number,
@@ -23,16 +23,7 @@ const NewComment = () => {
       body:""
     });
 
-    const cookies = new Cookies();
-    let user_token = cookies.get('user_token')
-
-    const isTokenExpired= async () => {
-      const headers = {'Authorization': 'Bearer '+user_token}
-      const response: any = await client.get(baseURL+`/users/token_expired`,{headers: headers});
-      if(response.status==200 && response.data.response=="expired"){
-        cookies.set('user_token', response.data.new_token, { path: '/' });
-      }
-    }
+    const { user_token } = useTokenContext()
   
     const onChange = (comment: React.ChangeEvent<HTMLTextAreaElement>, setFunction: { (value: React.SetStateAction<string>): void;}) => {
       setFunction(comment.target.value);
@@ -40,8 +31,8 @@ const NewComment = () => {
 
     const onSubmit = async (comment: React.FormEvent<HTMLFormElement>) => {
         comment.preventDefault();
-        await isTokenExpired();
-        const decodeUserToken = JSON.parse( JSON.stringify(decodeToken(user_token+"")));
+        const myDecodedToken = decodeToken(user_token+"");
+        const decodeUserToken = JSON.parse( JSON.stringify(myDecodedToken) );
         const payload = {body: body, user_id: decodeUserToken.user_id, token: user_token};
         const headers = {'Authorization': 'Bearer '+user_token}
     
@@ -83,3 +74,4 @@ const NewComment = () => {
 }
 
 export default NewComment;
+

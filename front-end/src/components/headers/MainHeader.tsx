@@ -1,11 +1,16 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from 'universal-cookie';
 
  export const MainHeader = () => {
     const navigate = useNavigate();
-    const logOut = () => {
-        navigate("/logout");
-      };
+    const cookies = new Cookies();
+
+    const logOut = async () => {
+      cookies.remove('user_token');
+      await cookies.get('user_token')
+      navigate("/login");
+    };
 
     return (
     <header className="text-gray-600 body-font">

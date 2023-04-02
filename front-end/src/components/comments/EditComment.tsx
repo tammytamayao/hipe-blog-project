@@ -2,7 +2,7 @@ import React, { useState, useEffect} from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {baseURL, client} from "../../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
-import Cookies from 'universal-cookie';
+import { useTokenContext } from "../../context/tokenContext";
 
 interface commentState {
     id: number,
@@ -17,20 +17,11 @@ const EditComment = () => {
     const params = useParams();
     const [body, setBody] = useState("");
 
-    const cookies = new Cookies();
-    let user_token = cookies.get('user_token')
-    const decodeUserToken = JSON.parse(JSON.stringify(decodeToken(user_token+"")));
-
-    const isTokenExpired= async () => {
-      const headers = {'Authorization': 'Bearer '+user_token}
-      const response: any = await client.get(baseURL+`/users/token_expired`,{headers: headers});
-      if(response.status==200 && response.data.response=="expired"){
-        cookies.set('user_token', response.data.new_token, { path: '/' });
-      }
-    }
+    const { user_token } = useTokenContext()
+    const myDecodedToken = decodeToken(user_token+"");
+    const decodeUserToken = JSON.parse( JSON.stringify(myDecodedToken));
 
     const getComment = async () => {
-      await isTokenExpired();
       const headers = { 'Authorization': 'Bearer '+user_token }
       const response: any = await client.get(baseURL+`/posts/${params.post_id}/comments/${params.id}`,{headers: headers});
       if(response.status===200) {
@@ -58,18 +49,17 @@ const EditComment = () => {
     const onSubmit = async (comment: React.FormEvent<HTMLFormElement>) => {
           
         comment.preventDefault();
-        await isTokenExpired();
         if (body.length > 0){bodyDef = body}
         const payload = {body: bodyDef, post_id: params.post_id, user_id: decodeUserToken.user_id, token: user_token};
         const headers = {'Authorization': 'Bearer '+user_token}
         const response: any = await client.put(baseURL+`/posts/${params.post_id}/comments/${params.id}/edit`,payload,{headers: headers});
             if(response.status===200) {
-                setComment(response.data);
-                alert("Comment Edited");
-                navigate(`/posts/${params.post_id}`);
-              } else {
-                alert('Comment not edited. Try Again.')
-              }
+              setComment(response.data);
+              alert("Comment Edited");
+              navigate(`/posts/${params.post_id}`);
+            } else {
+              alert('Comment not edited. Try Again.')
+            }
         }
 
     return (
@@ -103,3 +93,4 @@ const EditComment = () => {
 }
 
 export default EditComment;
+

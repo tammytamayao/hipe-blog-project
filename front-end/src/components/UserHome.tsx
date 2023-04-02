@@ -1,30 +1,12 @@
-import React, { useEffect} from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import {baseURL, client} from "../config/AxiosConfig";
 import { decodeToken } from "react-jwt";
-import Cookies from 'universal-cookie';
+import { useTokenContext } from "../context/tokenContext";
 
 const UserHome = () => {
-
-  const cookies = new Cookies();
-  let user_token = cookies.get('user_token')
-
+  const { user_token } = useTokenContext()
   const myDecodedToken = decodeToken(user_token+"");
   const decodeUserToken = JSON.parse( JSON.stringify(myDecodedToken) );
-
-  const payloadToken = {token: user_token};
-
-  const validateToken = async () => {
-    const headers = {'Authorization': 'Bearer '+user_token}
-    const response: any = await client.post(baseURL+`/users/requirejwt`, payloadToken,{headers:headers});
-    if(response.status===204) {
-      alert("Successfully Logged In");
-    } 
-  }
-
-  useEffect(() => {
-    validateToken();
-  },[]);
 
   return (
     <>

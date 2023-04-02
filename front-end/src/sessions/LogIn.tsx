@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {baseURL, client} from "../config/AxiosConfig";
 import Cookies from 'universal-cookie';
+import { useTokenContext } from "../context/tokenContext";
 
 interface userState {
     email: string,
@@ -10,6 +11,7 @@ interface userState {
 
 const LogIn = () => {
     
+    const { user_token, setUserToken } = useTokenContext()
         const cookies = new Cookies();
         const [email, setEmail] = useState("");
         const [password,setPassword] = useState("");
@@ -34,7 +36,7 @@ const LogIn = () => {
         }
     
         const onSubmit = async (post: React.FormEvent<HTMLFormElement>) => {
-    
+
             post.preventDefault();
             const payload = {email: email,password: password};
         
@@ -49,7 +51,8 @@ const LogIn = () => {
                 return
               }
               cookies.set('user_token', res["token"], { path: '/' });
-
+              let user_token = cookies.get('user_token')
+              setUserToken(user_token);
               navigate("/myprofile");
 
           };
@@ -89,7 +92,7 @@ const LogIn = () => {
                         id="password" value={password} onChange = {(e) => onChange(e, setPassword)} placeholder="Password" required
                     />
                 </div>
-                <a href="#" className="text-xs text-black hover:underline">Forget Password?</a>
+                <span className="text-xs text-black hover:underline">Forget Password?</span>
                 <div className="mt-6">
                     <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-black rounded-md hover:bg-black focus:outline-none focus:bg-black">
                         Login
@@ -99,7 +102,7 @@ const LogIn = () => {
 
         <p className="mt-8 text-xs font-light text-center text-gray-700">
             {" "}Don't have an account?{" "}
-            <a href="#" className="font-medium text-black hover:underline" ><Link to="/signup">Sign up</Link></a>
+            <span className="font-medium text-black hover:underline"><Link to="/signup">Sign up</Link></span>
         </p>
         </div>
         </div>
